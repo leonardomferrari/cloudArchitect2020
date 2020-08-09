@@ -1,0 +1,464 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+# Sample CFN YAML to demonstrate creating a crawler
+#
+#
+#
+# Resources section defines metadata for the Data Catalog
+Parameters:
+  Alias:
+    Type: String
+    Default: 'bleiva'
+    Description: Alias to create username and resources, for example dladmin-bleiva will be your lakeformation admin
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Need to define a static BucketName due to a circular dependency with the AWS::SNS::TopicPolicy
+      # BucketName: !Ref CFNS3BucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      AccessControl: BucketOwnerFullControl
+      LifecycleConfiguration:
+        Rules:
+          -
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 3
+            NoncurrentVersionExpirationInDays: 3
+            Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        -
+          Key: Description
+          Value: ML Transform FindMatches Demo Bucket
+      VersioningConfiguration:
+        Status: Enabled
+
+  CFNLakeAdmin:
+    Type: AWS::IAM::User
+    Properties:
+        LoginProfile:
+            Password: 'Digital2020+'
+        ManagedPolicyArns: 
+            - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
+            - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
+            - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+        UserName: !Sub "dladmin-${Alias}"
+        Policies:
+            -
+                PolicyName: "inline-datalakeadmin"
+                PolicyDocument:
+                    Version: "2012-10-17"
+                    Statement:
+                        -
+                            Effect: "Allow"
+                            Action: 
+                                - "lakeformation:*"
+                                - "cloudtrail:DescribeTrails"
+                                - "cloudtrail:LookupEvents"
+                                - "ram:ListPrincipals"
+                                - "ram:GetResourceShareInvitations"
+                            Resource: "*"
+                        -
+                            Effect: "Deny"
+                            Action: 
+                                - "lakeformation:PutDataLakeSettings"
+                            Resource: "*"
+                        -
+                            Effect: "Allow"
+                            Action: 
+                                - "iam:CreateServiceLinkedRole"
+                            Resource: "*"
+                            Condition: 
+                                StringEquals: 
+                                    "iam:AWSServiceName": "lakeformation.amazonaws.com"
+                        -
+                            Effect: "Allow"
+                            Action: 
+                                - "iam:PutRolePolicy"
+                            Resource: !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess']]
+                        -
+                            Effect: "Allow"
+                            Action: "iam:PassRole"
+                            Resource: "arn:aws:iam::*:role/AWSGlueServiceRole*"
+                        -
+                            Effect: "Allow"
+                            Action: "iam:PassRole"
+                            Resource: "arn:aws:iam::*:role/AWSGlueServiceNotebookRole*"
+                            Condition:
+                                StringLike:
+                                    "iam:PassedToService" : "ec2.amazonaws.com"
+                        -
+                            Effect: "Allow"
+                            Action: "iam:PassRole"
+                            Resource: "arn:aws:iam::*:role/service-role/AWSGlueServiceRole*"
+                        -
+                            Effect: "Allow"
+                            Action: "iam:PassRole"
+                            Resource: !GetAtt CFNGlueServiceMLLabRole.Arn
+
+  CFNAnalyst:
+    Type: AWS::IAM::User
+    Properties:
+        LoginProfile:
+            Password: 'Digital2020+'
+        ManagedPolicyArns: 
+            - arn:aws:iam::aws:policy/AmazonS3FullAccess
+            - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
+            - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+        UserName: !Sub "dlanalyst-${Alias}"
+        Policies:
+            -
+                PolicyName: "inline-analyst"
+                PolicyDocument:
+                    Version: "2012-10-17"
+                    Statement:
+                    -
+                        Effect: "Allow"
+                        Action: 
+                            - "athena:*"
+                            - "glue:*"
+                            - "iam:List*"
+                            - "iam:Get*"
+                            - "tag:Get*"
+                        Resource: "*"
+                    -
+                        Effect: "Allow"
+                        Action: 
+                            - "lakeformation:GetDataAccess"
+                            - "sns:ListTopics"
+                            - "sns:GetTopicAttributes"
+                            - "cloudwatch:PutMetricAlarm"
+                            - "cloudwatch:DescribeAlarms"
+                            - "cloudwatch:DeleteAlarms"
+                            - "logs:*"
+                        Resource: "*"
+                    -
+                        Effect: "Allow"
+                        Action: "iam:PassRole"
+                        Resource: "arn:aws:iam::*:role/AWSGlueServiceRole*"
+                    -
+                        Effect: "Allow"
+                        Action: "iam:PassRole"
+                        Resource: "arn:aws:iam::*:role/AWSGlueServiceNotebookRole*"
+                        Condition:
+                            StringLike:
+                                "iam:PassedToService" : "ec2.amazonaws.com"
+                    -
+                        Effect: "Allow"
+                        Action: "iam:PassRole"
+                        Resource: "arn:aws:iam::*:role/service-role/AWSGlueServiceRole*"
+                    -
+                        Effect: "Allow"
+                        Action: "iam:PassRole"
+                        Resource: !GetAtt CFNGlueServiceMLLabRole.Arn
+
+  CFNGlueServiceMLLabRole:
+    Type: AWS::IAM::Role    
+    Properties:
+        #RoleName: "AWSGlueServiceRole-LF-MLLab"
+        ManagedPolicyArns: 
+            - arn:aws:iam::aws:policy/AmazonS3FullAccess
+            - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+            - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+        AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+                -
+                    Effect: "Allow"
+                    Principal:
+                        Service:
+                            - "glue.amazonaws.com"
+                            - "lakeformation.amazonaws.com"
+                            - "lambda.amazonaws.com"
+                            - "sagemaker.amazonaws.com"
+                    Action:
+                        - "sts:AssumeRole"
+        Path: "/"
+        Policies:
+            -
+                PolicyName: "lakeformation-glue-service-inline-role"
+                PolicyDocument:
+                    Version: "2012-10-17"
+                    Statement:
+                        -
+                            Effect: "Allow"
+                            Action: 
+                                - "glue:*"
+                                - "lakeformation:*"
+                                - "iam:ListRoles"
+                                - "ec2:DescribeSecurityGroups"
+                                - "ec2:DescribeSubnets"
+                                - "ec2:DescribeVpcs"
+                                - "ec2:DescribeVpcEndpoints"
+                                - "ec2:DescribeRouteTables"
+                                - "ec2:DescribeVpcAttribute"
+                                - "ec2:DescribeKeyPairs"
+                                - "ec2:DescribeInstances"
+                                - "rds:DescribeDBInstances"
+                                - "cloudformation:DescribeStacks"
+                                - "cloudformation:GetTemplateSummary"
+                                - "dynamodb:ListTables"
+                                - "kms:ListAliases"
+                                - "kms:DescribeKey"
+                                - "cloudwatch:GetMetricData"
+                                - "cloudwatch:ListDashboards"
+                                - "logs:*"
+                                - "cloudformation:CreateStack"
+                                - "cloudformation:DeleteStack"
+                            Resource: "*"
+                        -
+                            Effect: "Allow"
+                            Action:
+                                - "ec2:RunInstances"
+                            Resource:
+                                - "arn:aws:ec2:*:*:instance/*"
+                                - "arn:aws:ec2:*:*:key-pair/*"
+                                - "arn:aws:ec2:*:*:image/*"
+                                - "arn:aws:ec2:*:*:security-group/*"
+                                - "arn:aws:ec2:*:*:network-interface/*"
+                                - "arn:aws:ec2:*:*:subnet/*"
+                                - "arn:aws:ec2:*:*:volume/*"
+                        -
+                            Effect: "Allow"
+                            Action:
+                                - "ec2:TerminateInstances"
+                                - "ec2:CreateTags"
+                                - "ec2:DeleteTags"
+                            Resource: "arn:aws:ec2:*:*:instance/*"
+                        -
+                            Effect: "Allow"
+                            Action: "iam:PassRole"
+                            Resource: "arn:aws:iam::*:role/AWSGlueServiceRole*"
+                        -
+                            Effect: "Allow"
+                            Action: "iam:PassRole"
+                            Resource: "arn:aws:iam::*:role/AWSGlueServiceNotebookRole*"
+                            Condition:
+                                StringLike:
+                                    "iam:PassedToService" : "ec2.amazonaws.com"
+                        -
+                            Effect: "Allow"
+                            Action: "iam:PassRole"
+                            Resource: "arn:aws:iam::*:role/service-role/AWSGlueServiceRole*"     
+                        -
+                            Effect: "Allow"
+                            Action: "tag:GetResources"
+                            Resource: "*"  
+
+  primer:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python2.7
+      Code:
+        ZipFile: |
+            import urllib
+            import boto3
+            import ast
+            import json
+            import cfnresponse
+            def lambda_handler(event, context):
+                s3 = boto3.client('s3')
+                target_bucket = event['ResourceProperties']['MyBucket'];
+                copy_source = {'Bucket':'re-invent2019-lakeformation-ml', 'Key':'data/synthetic_patients_source_dataset.csv'}
+                s3.copy_object(Bucket=target_bucket, Key='patientdata/rawdata/synthetic_patients_source_dataset.csv', CopySource=copy_source)
+                copy_source = {'Bucket':'re-invent2019-lakeformation-ml', 'Key':'data/labeled-dataset-200.csv'}
+                s3.copy_object(Bucket=target_bucket, Key='patientdata/labeldata/labeled-dataset-200.csv', CopySource=copy_source)
+                responseValue = int(event['ResourceProperties']['Input']) * 5
+                responseData = {}
+                responseData['Data'] = responseValue
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, "CustomResourcePhysicalID")
+      Description: Invoke a function to to copy s3 objects
+      MemorySize: 128
+      Timeout: 8
+      Role: !GetAtt CFNGlueServiceMLLabRole.Arn
+
+  primerinvoke:
+    Type: AWS::CloudFormation::CustomResource
+    Version: "1.0"
+    Properties:
+      ServiceToken: !GetAtt primer.Arn
+      MyBucket: !Ref S3Bucket
+      Input: 40
+
+  GlueDevEndPoint:
+    Type: AWS::Glue::DevEndpoint
+    Properties:
+      Arguments: {"--enable-glue-datacatalog": "", }
+      #EndpointName: "GlueDevEndpoint-SM"
+      GlueVersion: "0.9"
+      NumberOfWorkers: 5
+      WorkerType: "G.1X"
+      RoleArn: !GetAtt CFNGlueServiceMLLabRole.Arn
+
+  NotebookInstance:
+    Type: AWS::SageMaker::NotebookInstance
+    Properties:
+      InstanceType: ml.t2.medium
+      LifecycleConfigName: !GetAtt 'NotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName'
+      #NotebookInstanceName: !Join
+      #  - ''
+      #  -  - 'aws-glue-'
+      #     - 'ml-transform'
+      NotebookInstanceName: !Sub "aws-glue-ml-transform-${Alias}"
+      RoleArn: !GetAtt 'CFNGlueServiceMLLabRole.Arn'
+      Tags:
+        -
+          Key: aws-glue-dev-endpoint
+          Value: !Ref "GlueDevEndPoint"
+  NotebookInstanceLifecycleConfig:
+    Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
+    Properties:
+      #NotebookInstanceLifecycleConfigName: !Join
+      #  - ''
+      #  - - 'aws-glue-'
+      #    - 'ml-transform'
+      #    - '-LCConfig'
+      NotebookInstanceLifecycleConfigName: !Sub "aws-glue-ml-transform-LCConfig-${Alias}"
+      OnCreate:
+        -
+          Content:
+            Fn::Base64: !Sub
+              -
+                #!/bin/bash
+
+                set -ex
+
+                [ -e /home/ec2-user/glue_ready ] && exit 0
+
+
+                mkdir /home/ec2-user/glue
+
+                cd /home/ec2-user/glue
+
+                ASSETS=s3://aws-glue-jes-prod-${Region}-assets/sagemaker/assets/
+
+                DEV_ENDPOINT_NAME=test-vpc
+
+                aws s3 cp ${!ASSETS} . --recursive
+
+                bash "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh" -b -u -p "/home/ec2-user/glue/miniconda"
+
+                source "/home/ec2-user/glue/miniconda/bin/activate"
+
+                tar -xf autossh-1.4e.tgz
+
+                cd autossh-1.4e
+
+                ./configure
+
+                make
+
+                sudo make install
+
+                pip install pandas==0.22.0
+
+                mkdir -p /home/ec2-user/.sparkmagic
+
+                cp /home/ec2-user/glue/config.json /home/ec2-user/.sparkmagic/config.json
+
+                mkdir -p /home/ec2-user/SageMaker/Glue\ Examples
+
+                mv /home/ec2-user/glue/notebook-samples/* /home/ec2-user/SageMaker/Glue\ Examples/
+
+                aws s3 cp s3://re-invent2019-lakeformation-ml/notebooks/Glue\ ML\ Transforms\ Notebook.ipynb /home/ec2-user/SageMaker/
+
+                sudo cp /home/ec2-user/glue/autossh.conf /etc/init/
+
+                python3 /home/ec2-user/glue/bootstrap.py --devendpointname ${GlueDevEndPoint} --endpoint https://glue.${Region}.amazonaws.com --notebookname aws-glue-ml-transform-${Alias}
+
+                source "/home/ec2-user/glue/miniconda/bin/deactivate"
+
+                rm -rf "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh"
+
+                sudo touch /home/ec2-user/glue_ready
+              -
+                Region: !Ref AWS::Region
+                DevEndpointName: !Ref GlueDevEndPoint
+                NotebookName: !Sub "ml-transform-${Alias}"
+      OnStart:
+        -
+          Content:
+            Fn::Base64: !Sub
+              -
+                #!/bin/bash
+
+                set -ex
+
+                [ -e /home/ec2-user/glue_ready ] && exit 0
+
+
+                mkdir /home/ec2-user/glue
+
+                cd /home/ec2-user/glue
+
+                ASSETS=s3://aws-glue-jes-prod-${Region}-assets/sagemaker/assets/
+
+                DEV_ENDPOINT_NAME=test-vpc
+
+                aws s3 cp ${!ASSETS} . --recursive
+
+                bash "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh" -b -u -p "/home/ec2-user/glue/miniconda"
+
+                source "/home/ec2-user/glue/miniconda/bin/activate"
+
+                tar -xf autossh-1.4e.tgz
+
+                cd autossh-1.4e
+
+                ./configure
+
+                make
+
+                sudo make install
+
+                pip install pandas==0.22.0
+
+                mkdir -p /home/ec2-user/.sparkmagic
+
+                cp /home/ec2-user/glue/config.json /home/ec2-user/.sparkmagic/config.json
+
+                mkdir -p /home/ec2-user/SageMaker/Glue\ Examples
+
+                mv /home/ec2-user/glue/notebook-samples/* /home/ec2-user/SageMaker/Glue\ Examples/
+
+                aws s3 cp s3://re-invent2019-lakeformation-ml/notebooks/Glue\ ML\ Transforms\ Notebook.ipynb /home/ec2-user/SageMaker/
+
+                sudo cp /home/ec2-user/glue/autossh.conf /etc/init/
+
+                python3 /home/ec2-user/glue/bootstrap.py --devendpointname ${GlueDevEndPoint} --endpoint https://glue.${Region}.amazonaws.com --notebookname aws-glue-ml-transform-${Alias}
+
+                source "/home/ec2-user/glue/miniconda/bin/deactivate"
+
+                rm -rf "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh"
+
+                sudo touch /home/ec2-user/glue_ready
+              -
+                Region: !Ref AWS::Region
+                DevEndpointName: !Ref GlueDevEndPoint
+                NotebookName: !Sub "ml-transform-${Alias}"
+
+
+Outputs:
+  S3BucketName:
+    Description: S3 Bucket
+    Value: !Ref S3Bucket
+
+  DataLakeAdmin:
+    Description: Data Lake Admin
+    Value: !Ref CFNLakeAdmin
+
+  DataLakeAnalyst:
+    Description: Data Lake Analyst
+    Value: !Ref CFNAnalyst
+
+  LFGlueIAMRole:
+    Description: IAM Role for Lake Formation and Glue
+    Value: !Ref CFNGlueServiceMLLabRole
