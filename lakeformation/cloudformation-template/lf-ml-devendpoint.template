@@ -8,8 +8,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   Alias:
     Type: String
-    Default: 'bleiva'
-    Description: Alias to create username and resources, for example dladmin-bleiva will be your lakeformation admin
+    Default: 'aiouti'
+    Description: Alias to create username and resources, for example dladmin-aiouti will be your lakeformation admin
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -250,43 +250,7 @@ Resources:
                         -
                             Effect: "Allow"
                             Action: "tag:GetResources"
-                            Resource: "*"  
-
-  primer:
-    Type: AWS::Lambda::Function
-    Properties:
-      Handler: index.lambda_handler
-      Runtime: python2.7
-      Code:
-        ZipFile: |
-            import urllib
-            import boto3
-            import ast
-            import json
-            import cfnresponse
-            def lambda_handler(event, context):
-                s3 = boto3.client('s3')
-                target_bucket = event['ResourceProperties']['MyBucket'];
-                copy_source = {'Bucket':'re-invent2019-lakeformation-ml', 'Key':'data/synthetic_patients_source_dataset.csv'}
-                s3.copy_object(Bucket=target_bucket, Key='patientdata/rawdata/synthetic_patients_source_dataset.csv', CopySource=copy_source)
-                copy_source = {'Bucket':'re-invent2019-lakeformation-ml', 'Key':'data/labeled-dataset-200.csv'}
-                s3.copy_object(Bucket=target_bucket, Key='patientdata/labeldata/labeled-dataset-200.csv', CopySource=copy_source)
-                responseValue = int(event['ResourceProperties']['Input']) * 5
-                responseData = {}
-                responseData['Data'] = responseValue
-                cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, "CustomResourcePhysicalID")
-      Description: Invoke a function to to copy s3 objects
-      MemorySize: 128
-      Timeout: 8
-      Role: !GetAtt CFNGlueServiceMLLabRole.Arn
-
-  primerinvoke:
-    Type: AWS::CloudFormation::CustomResource
-    Version: "1.0"
-    Properties:
-      ServiceToken: !GetAtt primer.Arn
-      MyBucket: !Ref S3Bucket
-      Input: 40
+                            Resource: "*"
 
   GlueDevEndPoint:
     Type: AWS::Glue::DevEndpoint
@@ -297,154 +261,6 @@ Resources:
       NumberOfWorkers: 5
       WorkerType: "G.1X"
       RoleArn: !GetAtt CFNGlueServiceMLLabRole.Arn
-
-  NotebookInstance:
-    Type: AWS::SageMaker::NotebookInstance
-    Properties:
-      InstanceType: ml.t2.medium
-      LifecycleConfigName: !GetAtt 'NotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName'
-      #NotebookInstanceName: !Join
-      #  - ''
-      #  -  - 'aws-glue-'
-      #     - 'ml-transform'
-      NotebookInstanceName: !Sub "aws-glue-ml-transform-${Alias}"
-      RoleArn: !GetAtt 'CFNGlueServiceMLLabRole.Arn'
-      Tags:
-        -
-          Key: aws-glue-dev-endpoint
-          Value: !Ref "GlueDevEndPoint"
-  NotebookInstanceLifecycleConfig:
-    Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
-    Properties:
-      #NotebookInstanceLifecycleConfigName: !Join
-      #  - ''
-      #  - - 'aws-glue-'
-      #    - 'ml-transform'
-      #    - '-LCConfig'
-      NotebookInstanceLifecycleConfigName: !Sub "aws-glue-ml-transform-LCConfig-${Alias}"
-      OnCreate:
-        -
-          Content:
-            Fn::Base64: !Sub
-              -
-                #!/bin/bash
-
-                set -ex
-
-                [ -e /home/ec2-user/glue_ready ] && exit 0
-
-
-                mkdir /home/ec2-user/glue
-
-                cd /home/ec2-user/glue
-
-                ASSETS=s3://aws-glue-jes-prod-${Region}-assets/sagemaker/assets/
-
-                DEV_ENDPOINT_NAME=test-vpc
-
-                aws s3 cp ${!ASSETS} . --recursive
-
-                bash "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh" -b -u -p "/home/ec2-user/glue/miniconda"
-
-                source "/home/ec2-user/glue/miniconda/bin/activate"
-
-                tar -xf autossh-1.4e.tgz
-
-                cd autossh-1.4e
-
-                ./configure
-
-                make
-
-                sudo make install
-
-                pip install pandas==0.22.0
-
-                mkdir -p /home/ec2-user/.sparkmagic
-
-                cp /home/ec2-user/glue/config.json /home/ec2-user/.sparkmagic/config.json
-
-                mkdir -p /home/ec2-user/SageMaker/Glue\ Examples
-
-                mv /home/ec2-user/glue/notebook-samples/* /home/ec2-user/SageMaker/Glue\ Examples/
-
-                aws s3 cp s3://re-invent2019-lakeformation-ml/notebooks/Glue\ ML\ Transforms\ Notebook.ipynb /home/ec2-user/SageMaker/
-
-                sudo cp /home/ec2-user/glue/autossh.conf /etc/init/
-
-                python3 /home/ec2-user/glue/bootstrap.py --devendpointname ${GlueDevEndPoint} --endpoint https://glue.${Region}.amazonaws.com --notebookname aws-glue-ml-transform-${Alias}
-
-                source "/home/ec2-user/glue/miniconda/bin/deactivate"
-
-                rm -rf "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh"
-
-                sudo touch /home/ec2-user/glue_ready
-              -
-                Region: !Ref AWS::Region
-                DevEndpointName: !Ref GlueDevEndPoint
-                NotebookName: !Sub "ml-transform-${Alias}"
-      OnStart:
-        -
-          Content:
-            Fn::Base64: !Sub
-              -
-                #!/bin/bash
-
-                set -ex
-
-                [ -e /home/ec2-user/glue_ready ] && exit 0
-
-
-                mkdir /home/ec2-user/glue
-
-                cd /home/ec2-user/glue
-
-                ASSETS=s3://aws-glue-jes-prod-${Region}-assets/sagemaker/assets/
-
-                DEV_ENDPOINT_NAME=test-vpc
-
-                aws s3 cp ${!ASSETS} . --recursive
-
-                bash "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh" -b -u -p "/home/ec2-user/glue/miniconda"
-
-                source "/home/ec2-user/glue/miniconda/bin/activate"
-
-                tar -xf autossh-1.4e.tgz
-
-                cd autossh-1.4e
-
-                ./configure
-
-                make
-
-                sudo make install
-
-                pip install pandas==0.22.0
-
-                mkdir -p /home/ec2-user/.sparkmagic
-
-                cp /home/ec2-user/glue/config.json /home/ec2-user/.sparkmagic/config.json
-
-                mkdir -p /home/ec2-user/SageMaker/Glue\ Examples
-
-                mv /home/ec2-user/glue/notebook-samples/* /home/ec2-user/SageMaker/Glue\ Examples/
-
-                aws s3 cp s3://re-invent2019-lakeformation-ml/notebooks/Glue\ ML\ Transforms\ Notebook.ipynb /home/ec2-user/SageMaker/
-
-                sudo cp /home/ec2-user/glue/autossh.conf /etc/init/
-
-                python3 /home/ec2-user/glue/bootstrap.py --devendpointname ${GlueDevEndPoint} --endpoint https://glue.${Region}.amazonaws.com --notebookname aws-glue-ml-transform-${Alias}
-
-                source "/home/ec2-user/glue/miniconda/bin/deactivate"
-
-                rm -rf "/home/ec2-user/glue/Miniconda2-4.5.12-Linux-x86_64.sh"
-
-                sudo touch /home/ec2-user/glue_ready
-              -
-                Region: !Ref AWS::Region
-                DevEndpointName: !Ref GlueDevEndPoint
-                NotebookName: !Sub "ml-transform-${Alias}"
-
 
 Outputs:
   S3BucketName:
