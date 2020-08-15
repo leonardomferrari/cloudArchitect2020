@@ -18,8 +18,6 @@
 ## Specifies the Region your Terraform Provider will server
 provider "aws" {
   region     = "us-east-1"
-  access_key = "AKIAZBZCTTHSW2OUHSBJ"
-  secret_key = "3v8kKBxlafpD59w+hfpsgxxMEasn6Z9SivAKBTaT"
 }
 
 ## Specifies the S3 Bucket and DynamoDB table used for the durable backend and state locking
