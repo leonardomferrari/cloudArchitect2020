@@ -8,9 +8,9 @@ RUN apt-get install -y nano
 # Instala el cliente de AWS
 RUN pip install awscli
 
-# Consfiguracion de mi usuario de aws para poder conectarme. 
-RUN aws configure set aws_access_key_id xxx # provide aws access key id
-RUN aws configure set aws_secret_access_key xxxxx # provide aws secret access key
+# Consfiguracion de mi usuario de aws para poder conectarme.
+RUN aws configure set aws_access_key_id AKIAZBZCTTHSST4CP5RL # provide aws access key id
+RUN aws configure set aws_secret_access_key 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 # provide aws secret access key
 RUN aws configure set default.region us-east-1 # provide aws default region
 
 # Download del repostorio git en un directorio especifico

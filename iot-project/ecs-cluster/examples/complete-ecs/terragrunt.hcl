@@ -6,12 +6,12 @@
 
 #provider "aws" {
 #  region = "us-east-1"
-#  access_key = "AKIAZBZCTTHSST4CP5RL"
-#  secret_key = "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"
+#  access_key = "xxxxxxx"
+#  secret_key = "xxxxxxxx"
 #}
 
 
-#export AWS_ACCESS_KEY_ID="AKIAZBZCTTHSST4CP5RL"
-#export AWS_SECRET_ACCESS_KEY="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"
+#export AWS_ACCESS_KEY_ID="xxxx"
+#export AWS_SECRET_ACCESS_KEY="xxxxxxx"
 #export AWS_DEFAULT_REGION="us-east-1"
 #terraform plan

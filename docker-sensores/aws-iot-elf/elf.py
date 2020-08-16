@@ -29,7 +29,6 @@ from string import lowercase
 # from AWS IoT SDK @ https://github.com/aws/aws-iot-device-sdk-python
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient, DROP_OLDEST
 
-
 log = logging.getLogger('iot-elf')
 # log.setLevel(logging.DEBUG)
 log.setLevel(logging.INFO)
@@ -53,8 +52,7 @@ elf_id_key = "elf_id"
 elf_id = None
 policy_name_key = "elf_policy"
 policy_arn_key = "elf_policy_arn"
-thing_name_template = "thing_{0}"
-
+thing_name_template = 'aiouti_thing_{0}'
 
 make_string = lambda x: "".join(choice(lowercase) for i in range(x))
 
@@ -137,7 +135,7 @@ def _get_iot_session(region, profile_name):
         profile_name=profile_name).client('iot')
 
 
-#def _get_json_message(json_message):
+# def _get_json_message(json_message):
 #   msg = {}
 #   if json_message is None:
 #        return msg
@@ -170,6 +168,7 @@ def _get_json_messages_simulated(json_message):
             log.error("OSError while reading JSON Message file. {0}".format(
                 ose))
     return msg
+
 
 def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn, cli):
     # Create and attach to the principal/certificate the minimal action
@@ -292,6 +291,7 @@ class ElfPoster(ElfThread):
         self.message = cli.message
         self.json_message = cli.json_message
 
+
 #    def run(self):
 #        start = datetime.datetime.now()
 #        finish = start + datetime.timedelta(seconds=self.duration)
@@ -327,6 +327,7 @@ def run(self):
         time.sleep(1)  # wait a second between publishing iterations
         if finish < datetime.datetime.now():
             break
+
 
 class ElfListener(ElfThread):
     """
