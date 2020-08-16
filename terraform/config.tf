@@ -14,11 +14,11 @@ variable "company" {
 }
 
 variable "access_key" {
-  default = "AKIAZBZCTTHS2HEIQZ56"
+  default = ""
   type    = "string"
 }
 
 variable "secret_key" {
-  default = "w5hIgcahQxfF3WpzaPDeOw38WjtJydLJ37A5ZV4s"
+  default = ""
   type    = "string"
 }
