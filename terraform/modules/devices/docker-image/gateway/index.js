@@ -7,6 +7,12 @@ const fake = require('./fake')
 let awsIotDevice
 
 const initAWSIoT = async () => {
+  console.log("-----------------------------------------------------------------")
+  console.log(config.aws.iot.keyPath)
+  console.log(config.aws.iot.certPath)
+  console.log(config.aws.iot.caPath)
+  console.log(config.aws.iot.host)
+  console.log("-----------------------------------------------------------------")
   try {
     awsIotDevice = awsIotDeviceSdk({
       keyPath: config.aws.iot.keyPath,

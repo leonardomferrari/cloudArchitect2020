@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "aiouti-device" {
 [
   {
     "name": "aiouti-device",
-    "image": "pablojulianperalta/aiouti-device:1.2",
+    "image": "pablojulianperalta/aiouti-device:1.5",
     "cpu": 0,
     "memory": 128,
     "environment": [
@@ -49,7 +49,7 @@ resource "aws_ecs_service" "aiouti-device" {
   cluster         = var.cluster_id
   task_definition = aws_ecs_task_definition.aiouti-device.arn
 
-  desired_count = 1
+  desired_count = 5
 
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 0

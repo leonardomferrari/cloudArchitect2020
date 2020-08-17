@@ -1,5 +1,5 @@
 locals {
-  name = "complete-ecs"
+  name = "aiouti-ecs"
   environment = "dev"
 
   # This is the convention we use to know what belongs to each other
@@ -77,7 +77,7 @@ module "this" {
   # Launch configuration
   lc_name = local.ec2_resources_name
 
-  image_id = data.aws_ami.amazon_linux_ecs.id
+  image_id = "ami-09d8b5222f2b93bf0"
   instance_type = "t2.micro"
   security_groups = [module.vpc.default_security_group_id]
   iam_instance_profile = module.ec2-profile.this_iam_instance_profile_id
