@@ -11,7 +11,8 @@ phases:
       - "mv terraform /usr/local/bin/"
   pre_build:
     commands:
-      - cd terraform
+      - "ls"
+      - "cd ../terraform"
       - terraform init
 
   build:
