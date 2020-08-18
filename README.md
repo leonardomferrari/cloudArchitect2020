@@ -6,7 +6,7 @@ Esta plataforma IOT servirá para tomar mediciones de consumo energético en fá
 
 El objetivo final es optimizar el consumo energético en las fábricas.
 
-![plataforma](images/README/plataforma.jpg)
+![plataforma](images/README/iot-platform.png)
 
 ## Terraform
 
