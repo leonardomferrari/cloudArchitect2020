@@ -1,5 +1,5 @@
 // node_modules
-const awsIotDeviceSdk = require('aws-iot-device-sdk').device
+const awsIotDeviceSdk = require('aws-lambda-device-sdk').device
 const config = require('./config')
 const eventer = require('./eventer')
 const fake = require('./fake')

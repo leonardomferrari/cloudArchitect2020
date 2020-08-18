@@ -21,9 +21,54 @@ provider "aws" {
   access_key = var.access_key
   secret_key = var.secret_key
   region     = var.aws_region
+  profile    = "dh-terra"
 }
 
-## Specifies the S3 Bucket and DynamoDB table used for the durable backend and state locking
+## Specifies the S3 Bucket used for the durable backend and state locking
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "aiouti-lf"
+  # Enable versioning so we can see the full revision history of our
+  # state files
+  versioning {
+    enabled = true
+  }
+  # Enable server-side encryption by default
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "aiouti-terraform-locks"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+
 terraform {
   required_version = ">= 0.12"
+
+  backend "s3" {
+    bucket         = "aiouti-lf"
+    key            = "terraform-state/terraform.tfstate"
+    region         = "us-east-1"
+
+    dynamodb_table = "aiouti-terraform-locks"
+    encrypt        = true
+  }
+}
+
+provider "archive" {
+  version    = "~> 1.2"
+}
+
+provider "template" {
+  version    = "~> 2.1"
 }

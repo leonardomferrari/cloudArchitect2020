@@ -15,11 +15,11 @@ variable "company" {
 
 variable "iot_policy" {
   default = "aiouti-thing"
-  type = "string"
+  type    = "string"
 }
 
 variable "availability_zones" {
-  type = "list"
+  type        = "list"
   description = "The availability zones"
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
@@ -50,12 +50,12 @@ variable "instance_type" {
 
 variable "key_name" {
   description = "The aws ssh key name."
-  default     = "aiouti-key-pair-2"
+  default     = "aiouti-key-pair-terraform"
 }
 
 variable "key_file" {
   description = "The ssh public key for using with the cloud provider."
-  default     = "~/aiouti-key-pair.pem.pub"
+  default     = "modules/ecs-cluster/certs/aiouti-key-pair.pem.pub"
 }
 
 variable "aiouti_iot_core_uri" {

@@ -1,10 +1,10 @@
 /* template files for registry and ecs role policies */
 resource "template_file" "device_policy" {
-  template = file("policies/device-policy.json")
+  template = file("modules/ecs-cluster/policies/device-policy.json")
 }
 
 resource "template_file" "ecs_service_role_policy" {
-  template = file("policies/ecs-service-role-policy.json")
+  template = file("modules/ecs-cluster/policies/ecs-service-role-policy.json")
 
   vars = {
     s3_bucket_name = var.s3_bucket_name
@@ -12,7 +12,7 @@ resource "template_file" "ecs_service_role_policy" {
 }
 
 resource "template_file" "registry_task" {
-  template = file("task-definitions/device-task-definition.json")
+  template = file("modules/ecs-cluster/task-definitions/device-task-definition.json")
 
   vars = {
     aiouti_iot_core_uri   = var.aiouti_iot_core_uri
@@ -21,7 +21,7 @@ resource "template_file" "registry_task" {
 }
 
 resource "template_file" "user_data" {
-  template = file("user_data/user-data.sh")
+  template = file("modules/ecs-cluster/user_data/user-data.sh")
 
   vars = {
     cluster_name   = var.ecs_cluster_name

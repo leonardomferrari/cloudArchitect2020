@@ -1,7 +1,7 @@
 /* ecs iam role and policies */
 resource "aws_iam_role" "aiouti_ecs_role" {
   name               = "aiouti_ecs_role"
-  assume_role_policy = file("policies/ecs-role.json")
+  assume_role_policy = file("modules/ecs-cluster/policies/ecs-role.json")
 }
 
 /* ecs service scheduler role */
@@ -15,7 +15,7 @@ resource "aws_iam_role_policy" "aiouti_ecs_service_role_policy" {
 resource "aws_iam_role_policy" "aiouti_ecs_instance_role_policy" {
   name   = "ecs_instance_role_policy"
   role   = aws_iam_role.aiouti_ecs_role.id
-  policy = file("policies/ecs-instance-role-policy.json")
+  policy = file("modules/ecs-cluster/policies/ecs-instance-role-policy.json")
 }
 
 /**

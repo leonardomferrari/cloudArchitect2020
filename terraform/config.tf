@@ -1,24 +1,9 @@
-variable "aws_account_id" {
-  default = "622305974757"
-  type    = "string"
-}
-
-variable "aws_region" {
-  default = "us-east-1"
-  type    = "string"
-}
-
-variable "company" {
-  default = "Aiouti"
-  type    = "string"
-}
-
 variable "access_key" {
-  default = ""
-  type    = "string"
+  default = "AKIAZBZCTTHSW2OUHSBJ"
+  type    = string
 }
 
 variable "secret_key" {
-  default = ""
-  type    = "string"
+  default = "3v8kKBxlafpD59w+hfpsgxxMEasn6Z9SivAKBTaT"
+  type    = string
 }

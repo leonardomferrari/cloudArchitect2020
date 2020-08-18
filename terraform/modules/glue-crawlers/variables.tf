@@ -15,7 +15,7 @@ variable "crawler_description" {
 
 variable "crawler_role" {
   description = "Crawler Role"
-  default     = "arn:aws:iam::622305974757:role/aiouti-lf-stack-CFNGlueServiceMLLabRole-6Q9PXU7FSXLM"
+  default     = "arn:aws:iam::622305974757:role/aiouti-glue-role"
 }
 
 variable "data_source_path" {

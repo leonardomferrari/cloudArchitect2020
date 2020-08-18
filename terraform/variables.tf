@@ -1,38 +1,15 @@
-#######################################
-## main.tf Variables for Glue Crawler ##
-#######################################
-
-variable "crawler_name" {
-  description = "Crawler Name"
-  default     = "aiouti-crawler"
+variable "aws_account_id" {
+  default = "622305974757"
+  type    = string
 }
 
-variable "crawler_description" {
-  description = "Crawler Description"
-  default     = "Managed by TerraHub"
+variable "aws_region" {
+  default = "us-east-1"
+  type    = string
 }
 
-variable "crawler_role" {
-  description = "Crawler Role"
-  default     = "arn:aws:iam::622305974757:role/aiouti-lf-stack-CFNGlueServiceMLLabRole-6Q9PXU7FSXLM"
+variable "company" {
+  default = "Aiouti"
+  type    = string
 }
 
-variable "data_source_path" {
-  description = "S3 Source Path"
-  default     = "s3://aiouti-lf/lakeformation"
-}
-
-variable "database_name" {
-  description = "Database Name"
-  default     = "aiouti-db"
-}
-
-variable "table_prefix" {
-  description = "Table Prefix"
-  default     = ""
-}
-
-variable "schedule" {
-  description = "Schedule, a cron expression in form of cron(15 12 * * ? *) "
-  default     = "cron(0/10 * ? * MON-FRI *)"
-}

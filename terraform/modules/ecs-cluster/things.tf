@@ -94,11 +94,11 @@ resource "aws_iot_policy_attachment" "att-policy" {
 
 resource "aws_iot_thing" "thing" {
   count = local.quantity
-  name = "thing-${count.index}"
+  name = "aiouti-thing-${count.index}"
   thing_type_name = aws_iot_thing_type.fs-type.name
 
   attributes = {
-    First = "thing-${count.index}-"
+    First = "aiouti-thing-${count.index}-"
   }
 }
 
