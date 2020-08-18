@@ -10,7 +10,7 @@ El objetivo final es optimizar el consumo energético en las fábricas.
 
 ## Terraform
 
-La plataforma esta construida utilizando practicas de IaC. 
+La plataforma esta construida utilizando practicas :wqde IaC. 
 
 - buildspec.yml - YAML file used to build terraform project with CodeBuild in an EC2 instance
 

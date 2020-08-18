@@ -1,21 +1,24 @@
-version: 0.3
+version: 0.2
 
 phases:
 
   install:
     commands:
-      - "apt install unzip -y"
+      - "cd dataset"
+      - "apt install zip -y"
       - "wget https://releases.hashicorp.com/terraform/0.13.0/terraform_0.13.0_linux_amd64.zip"
-      - "unzip terraform_0.13.0_linux_amd64.zip"
+      - "unzip terraform*.zip"
       - "mv terraform /usr/local/bin/"
   pre_build:
     commands:
+      - "ls"
+      - "cd ../terraform"
       - terraform init
 
   build:
     commands:
-      - terraform $TF_COMMAND -auto-approve
+      - terraform apply -auto-approve
 
   post_build:
     commands:
-      - echo terraform $TF_COMMAND completed on `date`
+      - echo terraform apply completed on `date`

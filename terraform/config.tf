@@ -1,9 +1,9 @@
 variable "access_key" {
-  default = ""
+  default = "AKIAZBZCTTHSW2OUHSBJ"
   type    = string
 }
 
 variable "secret_key" {
-  default = ""
+  default = "3v8kKBxlafpD59w+hfpsgxxMEasn6Z9SivAKBTaT"
   type    = string
 }
