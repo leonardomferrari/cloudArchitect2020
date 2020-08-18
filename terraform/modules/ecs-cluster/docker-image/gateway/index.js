@@ -1,5 +1,5 @@
 // node_modules
-const awsIotDeviceSdk = require('aws-lambda-device-sdk').device
+const awsIotDeviceSdk = require('aws-iot-device-sdk').device
 const config = require('./config')
 const eventer = require('./eventer')
 const fake = require('./fake')
@@ -65,8 +65,6 @@ const initEventer = () => {
     console.log(JSON.stringify(event, null, '  '))
     if (event.type === 'data') {
       const parsedEvent = {
-        at: event.at,
-        id: event.id,
         ...event.payload.data
       }
       awsIotDevice.publish(config.aws.iot.topic, JSON.stringify(parsedEvent))
