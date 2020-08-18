@@ -8,8 +8,7 @@ class Eventer extends EventEmitter {
 
 const eventer = new Eventer()
 
-eventer.send = (event) =
->
+eventer.send = (event) =>
 {
   const id = random.createString(16)
   const at = utils.createTimestamp()

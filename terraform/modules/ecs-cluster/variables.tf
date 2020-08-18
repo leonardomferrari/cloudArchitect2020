@@ -36,7 +36,7 @@ variable "s3_bucket_name" {
 
 variable "device_docker_image" {
   description = "The docker image to use when provisioning the registry."
-  default     = "pablojulianperalta/aiouti-device:1.6"
+  default     = "pablojulianperalta/aiouti-device:1.8"
 }
 
 /* ECS optimized AMIs per region */
