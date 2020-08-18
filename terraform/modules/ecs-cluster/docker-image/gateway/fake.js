@@ -18,7 +18,7 @@ const fake = {
       device: "device-0",
       group: "group-0",
       devicetype: "FS-15",
-      date: "01-04-2018T00:0:00.000Z",
+      date: new Date().toISOString(),
       inputcurrent: Math.floor(850 + Math.random() * 100),
       inputcurrentunit: "amp",
       inputvoltage: Math.floor(210 + Math.random() * 20),
