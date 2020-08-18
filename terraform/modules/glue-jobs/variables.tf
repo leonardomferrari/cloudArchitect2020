@@ -30,7 +30,7 @@ variable "schedule" {
 
 variable "job_script_location" {
   description = "Job Script Location"
-  default = "s3://aiouti-lf/lakeformation/measurements/job/aiuoti"
+  default = "s3://aiouti-lf/lakeformation/measurements/job"
 }
 
 variable "job_tmp_dir" {
