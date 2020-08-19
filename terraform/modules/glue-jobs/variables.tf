@@ -37,3 +37,8 @@ variable "job_tmp_dir" {
   description = "Job Temporary Directory"
   default = "s3://aiouti-lf/lakeformation/measurements/temporary"
 }
+
+variable "region" {
+  description = "The AWS region to create resources in."
+  default     = "us-east-1"
+}
