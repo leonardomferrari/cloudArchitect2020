@@ -7,7 +7,8 @@ data "template_file" "tf_lambda_assume_role_policy" {
       "Effect": "Allow",
       "Principal": {
         "Service": [
-          "lambda.amazonaws.com"
+          "lambda.amazonaws.com",
+          "s3.amazonaws.com"
         ]
       },
       "Action": "sts:AssumeRole"

@@ -14,7 +14,7 @@ variable "job_description" {
 
 variable "job_role" {
   description = "Crawler Role"
-  default     = "arn:aws:iam::622305974757:role/aiouti-lf-stack-CFNGlueServiceMLLabRole-6Q9PXU7FSXLM"
+  default     = "arn:aws:iam::622305974757:role/aiouti-glue-role"
 }
 
 variable "data_source_path" {
@@ -30,7 +30,7 @@ variable "schedule" {
 
 variable "job_script_location" {
   description = "Job Script Location"
-  default = "s3://aiouti-lf/lakeformation/measurements/job/aiuoti"
+  default = "s3://aiouti-lf/lakeformation/measurements/job"
 }
 
 variable "job_tmp_dir" {
