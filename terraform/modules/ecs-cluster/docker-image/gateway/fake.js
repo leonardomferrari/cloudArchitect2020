@@ -1,23 +1,13 @@
 const random = require('./random')
 
 const fake = {
-  devices: [
-    'ptuudlga',
-    'ouaurksl',
-    'ttzccikk',
-    'didebjal',
-    'wydjgfqr',
-    'zpfjecet',
-    'lndbbrwb',
-    'gxcyuaau'
-  ],
   createData () {
-    const deviceId = fake.devices[random.createInteger(0, 7)]
+    let deviceTypes = ["FS-15", "LF-10", "PP-5"];
+    deviceId = Math.floor(Math.random());
     const data = {
-      deviceId,
-      device: "device-0",
-      group: "group-0",
-      devicetype: "FS-15",
+      device: "device-" + deviceId,
+      group: "group-" + deviceId % 10,
+      devicetype: deviceTypes[deviceId % 3],
       date: new Date().toISOString(),
       inputcurrent: Math.floor(850 + Math.random() * 100),
       inputcurrentunit: "amp",
@@ -32,7 +22,7 @@ const fake = {
       scale2: Math.floor(12 + Math.random() * 5),
       scale2unit: "kg",
       flow: Math.floor(40 + Math.random() * 10),
-      flowunit: "m3/h",
+      flowunit: "m3/h"
     }
     return data
   }
