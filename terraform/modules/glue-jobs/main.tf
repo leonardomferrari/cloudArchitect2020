@@ -3,6 +3,6 @@ resource "aws_glue_job" "example" {
   role_arn = var.job_role
 
   command {
-    script_location = "${var.job_script_location}/aiuoti"
+    script_location = "${var.job_script_location}/aiouti"
   }
 }
