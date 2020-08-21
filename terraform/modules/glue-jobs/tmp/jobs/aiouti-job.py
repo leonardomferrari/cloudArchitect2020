@@ -4,6 +4,7 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
+from awsglue.dynamicframe import DynamicFrame
 
 ## @params: [JOB_NAME]
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -19,7 +20,12 @@ datasource0 = glueContext.create_dynamic_frame.from_catalog(
   table_name="raw",
   transformation_ctx="datasource0")
 
-applymapping1 = ApplyMapping.apply(frame=datasource0, mappings=[
+# Convert to a dataframe and partition based on "partition_col"
+partitioned_dataframe = datasource0.toDF().repartition(1)
+# Convert back to a DynamicFrame for further processing.
+partitioned_dynamicframe = DynamicFrame.fromDF(partitioned_dataframe, glueContext, "partitioned_df")
+
+applymapping1 = ApplyMapping.apply(frame=partitioned_dynamicframe, mappings=[
   ("device", "string", "device", "string"),
   ("group", "string", "group", "string"),
   ("devicetype", "string", "devicetype", "string"),
