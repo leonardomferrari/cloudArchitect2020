@@ -11,5 +11,6 @@ resource "local_file" "my_glue_job" {
 resource "aws_s3_bucket_object" "s3_my_glue_job_py" {
   bucket = "aiouti-lf"
   key    =  "lakeformation/measurements/job/aiouti"
-  source = local_file.my_glue_job.filename
+  source = template_file.jobs_data.rendered
+  //source = local_file.my_glue_job.filename
 }
