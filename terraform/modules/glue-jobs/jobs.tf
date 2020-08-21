@@ -8,8 +8,8 @@ resource "local_file" "my_glue_job" {
   filename = "${local.jobpath}/aiouti-job.py"
 }
 
-resource "aws_s3_bucket_object" "s3_iot_cert_pem" {
+resource "aws_s3_bucket_object" "s3_my_glue_job_py" {
   bucket = "aiouti-lf"
-  key    =  "lakeformation/measurements/job"
+  key    =  "lakeformation/measurements/job/aiouti"
   source = local_file.my_glue_job.filename
 }
