@@ -4,28 +4,27 @@ variable "aws_region" {
 }
 
 variable "crawler_name" {
-  description = "Measurements Crawler"
-  default     = "aiouti-measurements-crawler"
+  description = "Crawler Name"
+  default     = "aiouti-crawler-processed"
 }
 
 variable "crawler_description" {
-  description = "This crawler finds measurements data every 5 minutes"
+  description = "Crawler Description"
   default     = "Managed by TerraHub"
 }
 
 variable "crawler_role" {
   description = "Crawler Role"
   default     = "arn:aws:iam::622305974757:role/aiouti-glue-role"
-  ## arn:aws:iam::622305974757:role/aiouti-lf-stack-CFNGlueServiceMLLabRole-6Q9PXU7FSXLM"
 }
 
 variable "data_source_path" {
   description = "S3 Source Path"
-  default     = "s3://aiouti-lf/lakeformation/measurements/raw"
+  default     = "s3://aiouti-lf/lakeformation/measurements/processed"
 }
 
 variable "database_name" {
-  description = "Aiouti Database"
+  description = "Database Name"
   default     = "aiouti-db"
 }
 
@@ -36,6 +35,6 @@ variable "table_prefix" {
 
 variable "schedule" {
   description = "Schedule, a cron expression in form of cron(15 12 * * ? *) "
-  default     = "cron(0/10 * ? * * *)"
+  default     = "cron(0/10 * ? * MON-FRI *)"
 }
 

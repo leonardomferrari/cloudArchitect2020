@@ -15,6 +15,6 @@ module "glue-jobs" {
   source = "./modules/glue-jobs"
 }
 
-module "measurements-crawler" {
-  source = "./modules/measurements-crawler"
+module "glue-crawlers-processed" {
+  source = "./modules/glue-crawlers-processed"
 }
