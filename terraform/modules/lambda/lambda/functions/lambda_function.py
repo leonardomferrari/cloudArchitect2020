@@ -10,7 +10,7 @@ def lambda_handler(event, context):
 
   bucket = 'aiouti-lf'
   date = str(round(datetime.datetime.strptime(event['date'],
-                                              '%d-%m-%YT%H:%M:%S.%fZ').timestamp()))
+                                              '%Y-%m-%dT%H:%M:%S.%fZ').timestamp()))
   key = date + '.json'
 
   with open('/tmp/' + key, "w+") as write_file:
