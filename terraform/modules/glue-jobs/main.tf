@@ -8,7 +8,7 @@ resource "aws_glue_job" "example" {
 }
 
 resource "aws_glue_trigger" "example" {
-  name     = "example"
+  name     = var.trigger_name
   schedule = "cron(0/10 * * * ? *)"
   type     = "SCHEDULED"
 

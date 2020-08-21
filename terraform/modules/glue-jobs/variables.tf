@@ -7,6 +7,11 @@ variable "job_name" {
   default     = "aiouti-job-lf"
 }
 
+variable "trigger_name" {
+  description = "Trigger Name"
+  default     = "aiouti-trigger-lf"
+}
+
 variable "job_description" {
   description = "Job Description"
   default     = "Managed by TerraHub"
