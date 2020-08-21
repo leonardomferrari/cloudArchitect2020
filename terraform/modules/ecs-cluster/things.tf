@@ -54,37 +54,25 @@ resource "aws_s3_bucket_object" "s3_certs_folder" {
   key    = "certs/"
 }
 
-resource "local_file" "iot_cert_pem" {
-  sensitive_content = aws_iot_certificate.cert.certificate_pem
-  filename = "${local.certspath}/certificate.cert.pem"
-}
-
 resource "aws_s3_bucket_object" "s3_iot_cert_pem" {
   bucket = "aiouti-lf"
   key    = "certs/certificate.cert.pem"
-  source = local_file.iot_cert_pem.filename
-}
-
-resource "local_file" "cert_public_key" {
-  sensitive_content = aws_iot_certificate.cert.public_key
-  filename = "${local.certspath}/certificate.public.key"
+  content = aws_iot_certificate.cert.certificate_pem
+  etag = md5(aws_iot_certificate.cert.certificate_pem)
 }
 
 resource "aws_s3_bucket_object" "s3_cert_public_key" {
   bucket = "aiouti-lf"
   key    = "certs/certificate.public.key"
-  source = local_file.cert_public_key.filename
-}
-
-resource "local_file" "cert_private_key" {
-  sensitive_content = aws_iot_certificate.cert.private_key
-  filename = "${local.certspath}/certificate.private.key"
+  content = aws_iot_certificate.cert.public_key
+  etag = md5(aws_iot_certificate.cert.public_key)
 }
 
 resource "aws_s3_bucket_object" "s3_cert_private_key" {
   bucket = "aiouti-lf"
   key    = "certs/certificate.private.key"
-  source = local_file.cert_private_key.filename
+  content = aws_iot_certificate.cert.private_key
+  etag = md5(aws_iot_certificate.cert.private_key)
 }
 
 resource "aws_iot_policy_attachment" "att-policy" {
