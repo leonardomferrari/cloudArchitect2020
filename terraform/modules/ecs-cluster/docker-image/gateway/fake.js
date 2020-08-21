@@ -3,7 +3,7 @@ const random = require('./random')
 const fake = {
   createData () {
     let deviceTypes = ["FS-15", "LF-10", "PP-5"];
-    deviceId = Math.floor(Math.random());
+    deviceId = Math.floor(Math.random() * 100);
     const data = {
       device: "device-" + deviceId,
       group: "group-" + deviceId % 10,

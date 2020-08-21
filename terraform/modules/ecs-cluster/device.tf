@@ -9,7 +9,7 @@ resource "aws_ecs_service" "aiouti_device_service" {
   cluster         = aws_ecs_cluster.aiouti_default.id
 
   task_definition = aws_ecs_task_definition.aiouti_device.arn
-  desired_count   = 1
+  desired_count   = 5
   depends_on      = [aws_iam_role_policy.aiouti_ecs_service_role_policy]
 
 }
