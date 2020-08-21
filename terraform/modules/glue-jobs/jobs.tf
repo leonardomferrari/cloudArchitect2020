@@ -10,6 +10,6 @@ resource "local_file" "my_glue_job" {
 
 resource "aws_s3_bucket_object" "s3_iot_cert_pem" {
   bucket = "aiouti-lf"
-  key    =  "aiouti"
+  key    =  "lakeformation/measurements/job"
   source = local_file.my_glue_job.filename
 }
