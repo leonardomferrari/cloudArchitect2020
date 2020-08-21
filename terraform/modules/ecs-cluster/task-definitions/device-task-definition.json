@@ -8,7 +8,7 @@
       "environment": [
         {
           "name": "IOT_URI",
-          "value": ""
+          "value": "${aiouti_iot_core_uri}"
         }
       ],
       "mountPoints": [
