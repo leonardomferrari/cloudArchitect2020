@@ -6,7 +6,7 @@ s3_client = boto3.client('s3')
 
 
 def lambda_handler(event, context):
-  print("Received event: " + json.dumps(event, indent=2))
+  print("Received event: " + json.dumps(event))
 
   bucket = 'aiouti-lf'
   date = str(round(datetime.datetime.strptime(event['date'],
@@ -14,7 +14,7 @@ def lambda_handler(event, context):
   key = date + '.json'
 
   with open('/tmp/' + key, "w+") as write_file:
-    json.dump(event, write_file, indent=4)
+    json.dump(event, write_file)
 
   s3_client.upload_file('/tmp/' + key, bucket,
                         'lakeformation/measurements/raw/' + key)
