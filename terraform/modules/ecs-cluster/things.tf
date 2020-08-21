@@ -63,6 +63,7 @@ resource "aws_s3_bucket_object" "s3_iot_cert_pem" {
   bucket = "aiouti-lf"
   key    = "certs/certificate.cert.pem"
   source = local_file.iot_cert_pem.filename
+  etag = filemd5(local_file.iot_cert_pem.filename)
 }
 
 resource "local_file" "cert_public_key" {
@@ -74,6 +75,7 @@ resource "aws_s3_bucket_object" "s3_cert_public_key" {
   bucket = "aiouti-lf"
   key    = "certs/certificate.public.key"
   source = local_file.cert_public_key.filename
+  etag = filemd5(local_file.cert_public_key.filename)
 }
 
 resource "local_file" "cert_private_key" {
@@ -85,6 +87,7 @@ resource "aws_s3_bucket_object" "s3_cert_private_key" {
   bucket = "aiouti-lf"
   key    = "certs/certificate.private.key"
   source = local_file.cert_private_key.filename
+  etag = filemd5(local_file.cert_private_key.filename)
 }
 
 resource "aws_iot_policy_attachment" "att-policy" {
