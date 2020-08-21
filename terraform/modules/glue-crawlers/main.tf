@@ -1,5 +1,6 @@
 # Updated because of https://www.terraform.io/upgrade-guides/0-13.html#destroy-time-provisioners-may-not-refer-to-other-resources
 resource "null_resource" "crawler" {
+
   triggers = {
     module = path.module
     crawler_name = var.crawler_name
