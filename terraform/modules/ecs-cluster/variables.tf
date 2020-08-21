@@ -1,6 +1,6 @@
 variable "aws_account_id" {
   default = "622305974757"
-  type    = "string"
+  type    = string
 }
 
 variable "region" {
@@ -10,16 +10,16 @@ variable "region" {
 
 variable "company" {
   default = "Aiouti"
-  type    = "string"
+  type    = string
 }
 
 variable "iot_policy" {
   default = "aiouti-thing"
-  type    = "string"
+  type    = string
 }
 
 variable "availability_zones" {
-  type        = "list"
+  type        = list
   description = "The availability zones"
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
