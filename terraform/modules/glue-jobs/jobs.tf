@@ -1,5 +1,4 @@
 locals {
-  quantity = 3
   jobpath = "${path.module}/tmp/jobs"
 }
 
@@ -8,8 +7,8 @@ resource "local_file" "my_glue_job" {
   filename = "${local.jobpath}/aiouti-job.py"
 }
 
-resource "aws_s3_bucket_object" "s3_iot_cert_pem" {
+resource "aws_s3_bucket_object" "aiouti_python_job" {
   bucket = "aiouti-lf"
-  key    =  "lakeformation/measurements/job"
+  key    =  "lakeformation/measurements/job/aiouti-job.py"
   source = local_file.my_glue_job.filename
 }
