@@ -20,7 +20,7 @@ variable "crawler_role" {
 
 variable "data_source_path" {
   description = "S3 Source Path"
-  default     = "s3://aiouti-lf/lakeformation"
+  default     = "s3://aiouti-lf/lakeformation/measurements/raw"
 }
 
 variable "database_name" {
