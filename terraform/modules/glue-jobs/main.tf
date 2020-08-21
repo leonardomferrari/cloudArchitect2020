@@ -6,3 +6,13 @@ resource "aws_glue_job" "example" {
     script_location = "${var.job_script_location}/aiouti"
   }
 }
+
+resource "aws_glue_trigger" "example" {
+  name     = "example"
+  schedule = "cron(0/10 * * * ? *)"
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = aws_glue_job.example.name
+  }
+}
