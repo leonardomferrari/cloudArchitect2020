@@ -5,7 +5,7 @@ locals {
 
 
 resource "local_file" "my_glue_job" {
-  filename = "${local.jobpath}/aiouti.py"
+  filename = "${local.jobpath}/aiouti-job.py"
 }
 
 resource "aws_s3_bucket_object" "s3_iot_cert_pem" {
