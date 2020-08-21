@@ -42,3 +42,8 @@ variable "region" {
   description = "The AWS region to create resources in."
   default     = "us-east-1"
 }
+
+variable "aws_account_id" {
+  default = "622305974757"
+  type    = "string"
+}
